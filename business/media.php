@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/cors.php';
+forge_api_cors(['GET']);
+
 $file = $_GET['file'] ?? '';
 if (!is_string($file) || !preg_match('/\A[A-Za-z0-9][A-Za-z0-9._ -]*\.(jpg|jpeg|png|webp|gif|mp3|wav|ogg)\z/i', $file)) {
     http_response_code(404);

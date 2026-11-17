@@ -92,7 +92,7 @@ function business_public_record(array $row): array
 function business_media_url(): string
 {
     require_once __DIR__ . '/../includes/installer.php';
-    return eventforge_public_path('business/media.php?file=');
+    return rtrim(eventforge_site_url(), '/') . eventforge_public_path('business/media.php?file=');
 }
 
 function business_list(mysqli $db, bool $publicOnly): array
