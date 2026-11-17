@@ -12,6 +12,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET') {
     exit;
 }
 
+$id = 0;
+if (isset($_GET['id'])) {
+    $id = filter_var($_GET['id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id === false) {
+        http_response_code(400);
+        echo '{"error":"Invalid business ID."}';
+        exit;
+    }
+}
+
 try {
     require_once __DIR__ . '/../includes/installer.php';
     require_once __DIR__ . '/store.php';
@@ -19,7 +29,19 @@ try {
     if (!$db) {
         throw new RuntimeException('Event Forge database is unavailable.');
     }
-    $body = json_encode(['businesses' => business_list($db, true)], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+    $payload = [];
+    if ($id > 0) {
+        $business = business_find_public($db, $id);
+        if ($business === null) {
+            http_response_code(404);
+            echo '{"error":"Business not found."}';
+            exit;
+        }
+        $payload = ['business' => $business];
+    } else {
+        $payload = ['businesses' => business_list($db, true)];
+    }
+    $body = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
     echo $body;
 } catch (Throwable $e) {
     error_log('Business API: ' . $e->getMessage());

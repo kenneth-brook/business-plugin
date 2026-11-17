@@ -221,3 +221,17 @@ function business_receive_uploads(array &$input, array $uploads): array
         throw $e;
     }
 }
+
+function business_find_public(mysqli $db, int $id): ?array
+{
+    $result = $db->query('SELECT * FROM business_directory_listings WHERE is_published = 1 AND id = ' . $id);
+    if (!$result) {
+        throw new RuntimeException('Directory lookup failed: ' . $db->error);
+    }
+    $row = $result->fetch_assoc();
+    if (!$row) {
+        return null;
+    }
+    $row['id'] = (int) $row['id'];
+    return business_public_record($row);
+}

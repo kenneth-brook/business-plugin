@@ -65,3 +65,13 @@ existing listings or download files. Copy the old files from
 
 This feed is the directory's native API. Exact kiosk and mobile application
 response adapters still require the existing client endpoint contract.
+
+## Website integration
+
+The public website reads this module through the API. The panel creates and
+edits source records. `GET business/api.php?id=123` returns
+`{"business":{...}}` for a published listing. Draft or missing IDs return
+404, and invalid IDs return 400. A list request keeps the existing
+`{"businesses":[...]}` wrapper. Both responses exclude internal fields and
+include the resolved media URLs. The itinerary reference frontend uses this
+same listing API alongside Event Forge's event feed.
