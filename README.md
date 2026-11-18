@@ -75,3 +75,30 @@ edits source records. `GET business/api.php?id=123` returns
 `{"businesses":[...]}` wrapper. Both responses exclude internal fields and
 include the resolved media URLs. The itinerary reference frontend uses this
 same listing API alongside Event Forge's event feed.
+
+## Review site browser access
+
+The default CORS policy permits `https://review.365dtm.com`, including pages
+under `/fct`. CORS origins contain only the scheme, host and optional port.
+The policy also accepts requests from the API's own origin and non-browser
+clients without an Origin header. Other browser origins receive 403.
+
+Copy `business/cors-config.sample.php` to `business/cors-config.php` to
+configure a different allowlist. List exact origins, without trailing slashes
+or page paths. Preserve the configuration file during code updates.
+
+From the review site, the frontend can use an absolute URL.
+
+```javascript
+const response = await fetch(
+  'https://www.franklin-county.com/event-forge/events/business/api.php'
+);
+if (!response.ok) throw new Error('Unable to load businesses.');
+const { businesses } = await response.json();
+const dining = businesses.filter(business => business.category === 'Dining');
+```
+
+The business feed and media endpoint support GET preflight requests. The
+optional Event Forge API update reads this same policy for cross-origin
+calendar requests. These CORS settings do not supply legacy kiosk/app
+response adapters.
